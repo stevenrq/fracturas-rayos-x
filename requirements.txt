@@ -1,0 +1,43 @@
+# =============================================================================
+#  Dependencias de desarrollo LOCAL
+#  -------------------------------------------------------------------------
+#  IMPORTANTE: TensorFlow NO publica wheels para Python 3.14 (el del sistema).
+#  Crea el entorno con Python 3.11 o 3.12. Ejemplo:
+#       python3.12 -m venv .venv
+#       source .venv/bin/activate
+#       pip install --upgrade pip
+#       pip install -r requirements.txt
+#  Tras instalar, congela versiones exactas:  pip freeze > requirements.lock.txt
+#
+#  El ENTRENAMIENTO se hace en Google Colab (GPU T4), donde TensorFlow ya viene
+#  instalado; allí no necesitas este archivo.
+#  El DESPLIEGUE usa su propio requirements (ver carpeta space/).
+# =============================================================================
+
+# --- Núcleo numérico / datos ---
+numpy
+pandas
+
+# --- Visualización / EDA ---
+matplotlib
+seaborn
+
+# --- Machine learning / métricas ---
+scikit-learn
+
+# --- Imágenes / visión por computadora ---
+pillow
+opencv-python-headless
+imagehash            # detección de duplicados (perceptual) en el EDA
+
+# --- Deep learning (inferencia local en CPU; en Colab ya viene con GPU) ---
+tensorflow-cpu
+
+# --- Interfaces de usuario ---
+gradio
+streamlit
+
+# --- Hugging Face y Kaggle (descarga de datos y modelo) ---
+kagglehub            # descarga automática del dataset (src/prepare_data.py, src/prepare_data_multiclass.py)
+split-folders        # particionado train/val/test del dataset multiclase (src/prepare_data_multiclass.py)
+huggingface_hub

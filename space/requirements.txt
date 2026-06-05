@@ -1,0 +1,6 @@
+gradio
+tensorflow-cpu
+huggingface_hub
+pillow
+numpy
+opencv-python-headless

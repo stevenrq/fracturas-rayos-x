@@ -1,0 +1,42 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.ipynb_checkpoints/
+
+# ---- Entornos virtuales ----
+.venv/
+venv/
+env/
+.python-version
+.env
+
+# ---- Datos y modelos pesados (NO subir a git) ----
+data/raw/
+data/processed/
+data/processed_multiclass/
+archive/
+*.h5
+*.keras
+*.pt
+*.pkl
+*.tflite
+*.zip
+
+# ---- Salidas de notebooks/experimentos ----
+mlruns/
+.tensorboard/
+wandb/
+
+# ---- IDE / Sistema ----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ---- Documentación y otros archivos internos ----
+GUIA_PROYECTO_FRACTURAS.md
+metodologia_por_fases_proyecto_final_hasta_despliegue.md
+Proyecto_Radiografias.md
+genera-un-plan-completo-stateless-kurzweil.md

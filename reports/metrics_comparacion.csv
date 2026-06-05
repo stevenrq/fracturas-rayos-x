@@ -1,0 +1,4 @@
+modelo,accuracy,recall,specificity,precision,f1,auc,false_negatives,false_positives,tiempo_inf_s,tamaño_MB
+CNN desde cero,0.673,0.243,0.982,0.905,0.383,0.820,178,6,0.065,1.2
+MobileNetV2,0.815,0.796,0.829,0.770,0.782,0.910,48,56,0.070,9.7
+EfficientNetB0,0.798,0.681,0.881,0.804,0.737,0.919,75,39,0.076,43.4
