@@ -136,4 +136,4 @@ App **Gradio** en **Hugging Face Spaces** (CPU gratis). Carpeta lista en
 
 - Código: **MIT** (ver [`LICENSE`](LICENSE)).
 - Datos: *Bone Fracture Multi-Region X-ray Data*, licencia **ODC-By v1.0** (atribución al autor del dataset).
-- Autor del proyecto: Steven · Prof. Oswaldo Vélez Langs, PhD.
+- Autores del proyecto: **Steven Ricardo Quiñones** y **Amaury Díaz Betín** · Prof. Oswaldo Vélez Langs, PhD.
