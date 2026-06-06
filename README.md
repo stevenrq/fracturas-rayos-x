@@ -9,7 +9,7 @@ criterio clínico y desplegado como demo interactiva.
 > médico ni está validada clínicamente. Sus predicciones son orientativas, pueden
 > contener errores y **no sustituyen el diagnóstico de un profesional de la salud**.
 
-- 🔗 **Demo (Hugging Face Space):** *por publicar* (ver Fase 4).
+- 🔗 **Demo (Hugging Face Space):** [stevenrq8/fracturas-rayos-x](https://huggingface.co/spaces/stevenrq8/fracturas-rayos-x)
 - 📊 **Resultados y reflexión crítica:** [`reports/resultados.md`](reports/resultados.md).
 
 ---
