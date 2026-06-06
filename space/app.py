@@ -2,12 +2,14 @@
 
 Standalone: carga el modelo desde un *Model repo* de Hugging Face (o un archivo
 local junto a app.py si usas Git LFS), expone una interfaz para subir radiografías
-y muestra P(fractura), etiqueta, confianza y un mapa de calor Grad-CAM.
+y muestra P(fractura), etiqueta, confianza, un mapa de calor Grad-CAM y un
+comentario textual generado por Llama 3 vía HF Inference API.
 
 Configurable por variables de entorno (pestaña Settings → Variables del Space):
     MODEL_REPO   repo del modelo en HF      (def. "stevenrq8/fracturas-modelo")
     MODEL_FILE   nombre del archivo .keras  (def. "best_mobilenet.keras")
     UMBRAL       umbral P(fractura)         (def. "0.31"; usa el de resultados.md)
+    HF_TOKEN     token de HF (secret recomendado; necesario para el comentario LLM)
 """
 import os
 
@@ -96,9 +98,47 @@ def _gradcam(pil):
     return Image.fromarray((color * 0.4 + img * 0.6).astype("uint8"))
 
 
+def _comentario_llm(pil, p_fractura):
+    """Genera un comentario orientativo usando Llama 3 vía HF Inference API.
+
+    Requiere la variable de entorno / secret HF_TOKEN.
+    """
+    from huggingface_hub import InferenceClient
+
+    hf_token = os.environ.get("HF_TOKEN")
+    if not hf_token:
+        return "HF_TOKEN no configurado — comentario no disponible."
+
+    etiqueta = "FRACTURA" if p_fractura >= UMBRAL else "NORMAL"
+    prompt = (
+        f"Un clasificador CNN analizó una radiografía ósea y obtuvo: "
+        f"Predicción={etiqueta}, P(fractura)={p_fractura:.1%}. "
+        "Describe brevemente en 3-4 frases qué podría significar este resultado, "
+        "qué zonas debería revisar un médico y recuerda que es solo orientativo. "
+        "Responde en español."
+    )
+
+    try:
+        client = InferenceClient(token=hf_token)
+        response = client.chat_completion(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Eres un asistente educativo de radiología. Tu salida es ilustrativa, no un diagnóstico.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            model="meta-llama/Meta-Llama-3-8B-Instruct",
+            max_tokens=300,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return "Comentario no disponible: " + str(e)
+
+
 def predecir(img):
     if img is None:
-        return None, "Sube una radiografía.", None
+        return None, "Sube una radiografía.", None, ""
     pil = img.convert("RGB")
     arr = np.asarray(pil.resize(IMG_SIZE), dtype="float32")[None, ...]
     p = float(model.predict(arr, verbose=0).ravel()[0])
@@ -110,12 +150,18 @@ def predecir(img):
         cam = None
     resumen = (f"Predicción: {etiqueta}  ·  P(fractura) = {p:.1%}  ·  "
                f"Confianza = {max(p, 1 - p):.1%}  (umbral {UMBRAL:.2f})")
-    return {"fractura": p, "normal": 1 - p}, resumen, cam
+    comentario = _comentario_llm(pil, p)
+    return {"fractura": p, "normal": 1 - p}, resumen, cam, comentario
 
 
 EXAMPLES = (
     [["ejemplos/normal.jpg"], ["ejemplos/fractura.jpg"]]
     if os.path.exists("ejemplos/normal.jpg") else None
+)
+
+LLM_NOTE = (
+    "\n\n---\n⚠️ **Comentario LLM** generado por **Meta-Llama-3-8B-Instruct** vía HF Inference API. "
+    "Es ilustrativo, puede contener errores y **no constituye un diagnóstico clínico**."
 )
 
 demo = gr.Interface(
@@ -125,10 +171,11 @@ demo = gr.Interface(
         gr.Label(num_top_classes=2, label="Probabilidades"),
         gr.Textbox(label="Resultado"),
         gr.Image(type="pil", label="Grad-CAM (zona observada por el modelo)"),
+        gr.Textbox(label="Comentario LLM (ilustrativo, no diagnóstico)"),
     ],
     title="🦴 Detección de fracturas óseas (demo académica)",
     description="Sube una radiografía y el modelo estimará la probabilidad de fractura.\n\n" + DISCLAIMER,
-    article=DISCLAIMER,
+    article=DISCLAIMER + LLM_NOTE,
     examples=EXAMPLES,
     flagging_mode="never",
 )
